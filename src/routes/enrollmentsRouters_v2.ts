@@ -17,9 +17,20 @@ const router = Router();
 router.get("/", authenticateToken, checkRoleAdmin, (req: Request, res: Response) => {
     try{
     const enrollments_information = students.map(student => { 
+    
+    //testv3
+    // ({
+    //   studentId: student.studentId,
+    //   courses: student.courses 
+    // ? student.courses.map(courseId => ({ courseId })) 
+    // : [] // ถ้าไม่มี courses ให้เป็น []
+    // }));
 
-     //const course = student.courses?.map(courseId => ({courseId: courseId}));
-     // ไม่แน่ใจว่าให้ดึงข้อมูลจาก enrollments เป็นหลักมาแสดงหรือ students เป็นหลัก
+    //testv1
+    //const course = student.courses?.map(courseId => ({courseId: courseId}));
+    // ไม่แน่ใจว่าให้ดึงข้อมูลจาก enrollments เป็นหลักมาแสดงหรือ students เป็นหลัก
+
+
      const studentEnrollments = enrollments
         .filter(e => e.studentId === student.studentId)
         .map(e => ({ courseId: e.courseId }));
