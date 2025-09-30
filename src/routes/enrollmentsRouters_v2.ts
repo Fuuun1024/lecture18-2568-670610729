@@ -5,10 +5,10 @@ import { students, courses, enrollments, users, reset_users, reset_enrollments }
 
 import { authenticateToken } from "../middlewares/authenMiddleware.js"
 import { checkRoleAdmin } from "../middlewares/checkRoleAdminMiddleware.js"
-import { checkRoleStudent } from "../middlewares/checkRoleStudentMiddleware.js"
+import { checkRoleStudent, checkRoleOwner } from "../middlewares/checkRoleStudentMiddleware.js"
 import { checkAllRole } from "../middlewares/checkAllRoleMiddleware.js"
 
-import { zStudentId, zEnrollmentPostBody } from "../libs/zodValidators.js";
+import { zStudentId, zEnrollmentPostBody, zEnrollmentDeleteBody } from "../libs/zodValidators.js";
 import type { Enrollment } from "../libs/types.js"
 
 const router = Router();
@@ -173,6 +173,52 @@ router.post("/:studentId", authenticateToken, checkRoleStudent, (req: Request, r
       error: err,
     });
   }
+});
+
+// DELETE /api/v2/enrollments/:studentId
+router.delete("/:studentId", authenticateToken, checkRoleOwner, (req: Request, res: Response) => {
+    try {
+    const body = req.body as Enrollment;
+    const studentId = req.params.studentId;
+
+    const result = zEnrollmentDeleteBody.safeParse(body); // check zod
+    if (!result.success) {
+      return res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        errors: result.error.issues[0]?.message,
+      });
+    }
+
+    const foundIndex = enrollments.findIndex(
+        (e) => e.courseId === body.courseId
+    );
+
+    if (foundIndex === -1) {
+        return res.status(404).json({
+            success: false,
+            message: "Enrollments does not exists",
+        });
+    }
+
+    //delete found course from array
+    enrollments.splice(foundIndex, 1);
+
+    res.status(200).json({
+      success: true,
+      message: `Student ${studentId} && Course ${body.courseId} has been deleted successfully`,
+       data: enrollments,
+    });
+    
+
+    }catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "Somthing is wrong, please try again",
+      error: err,
+    });
+  }
+
 });
 
 export default router;

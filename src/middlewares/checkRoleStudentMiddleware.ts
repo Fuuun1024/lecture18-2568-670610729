@@ -20,9 +20,33 @@ export const checkRoleStudent = (
   // 2. check if user exists (search with username) and role is STUDENT
   const user = users.find((u: User) => u.username === payload?.username);
   if (!user || user.role !== "STUDENT" || payload?.studentId !== req.params.studentId) {
-    return res.status(401).json({
+    return res.status(403).json({
       success: false,
       message: "Forbidden access",
+    });
+  }
+
+  // (optional) check if token exists in user data
+
+  // Proceed to next middleware or route handler
+  next();
+};
+
+export const checkRoleOwner = (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  // 1. get "user payload" and "token" from (custom) request
+  const payload = req.user;
+  const token = req.token;
+
+  // 2. check if user exists (search with username) and role is Owner
+  const user = users.find((u: User) => u.username === payload?.username);
+  if (!user || user.role !== "STUDENT" || payload?.studentId !== req.params.studentId) {
+    return res.status(403).json({
+      success: false,
+      message: "You are not allowed to modify another student's data",
     });
   }
 

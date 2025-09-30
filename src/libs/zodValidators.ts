@@ -59,3 +59,7 @@ export const zEnrollmentPostBody = z.object({
   studentId: zStudentId,
   courseId: zCourseId,
 });
+
+export const zEnrollmentDeleteBody = z.object({
+  courseId: zCourseId
+});
