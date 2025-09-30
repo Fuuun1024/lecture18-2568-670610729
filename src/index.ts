@@ -9,6 +9,8 @@ import notFoundMiddleware from "./middlewares/notFoundMiddleware.js";
 import studentRouter_v2 from "./routes/studentsRoutes_v2.js";
 import studentRouter_v3 from "./routes/studentsRoutes_v3.js";
 import courseRouter_v2 from "./routes/coursesRouters_v2.js";
+import usersRouter_v2 from "./routes/usersRoutes.js"
+import enrollmentsRouter_v2 from "./routes/enrollmentsRouters_v2.js"
 
 const app = express();
 const port = 3000;
@@ -20,7 +22,7 @@ app.use(express.json());
 app.use(morgan("dev"));
 // app.use(morgan("combined"));
 
-// JSON parser middleware
+// JSON parser middleware //check format Json body request
 app.use(invalidJsonMiddleware);
 
 // Endpoints
@@ -45,8 +47,11 @@ app.get("/me", (req: Request, res: Response) => {
 app.use("/api/v2/students", studentRouter_v2);
 app.use("/api/v3/students", studentRouter_v3);
 app.use("/api/v2/courses", courseRouter_v2);
+app.use("/api/v2/users",usersRouter_v2);
+app.use("/api/v2/enrollments",enrollmentsRouter_v2);
 
 // endpoint check middleware
+// ถ้าผู้ใช้ ยิง endpoint ที่ไม่มีมา
 app.use(notFoundMiddleware);
 
 app.listen(port, () => {
