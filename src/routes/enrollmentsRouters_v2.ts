@@ -1,14 +1,15 @@
 import { Router, type Request, type Response } from "express";
 
-import type { User, CustomRequest, UserPayload } from "../libs/types.js";
-import { students, users, reset_users } from "../db/db.js";
+import type { User, CustomRequest, UserPayload, } from "../libs/types.js";
+import { students, courses, enrollments, users, reset_users, reset_enrollments } from "../db/db.js";
 
 import { authenticateToken } from "../middlewares/authenMiddleware.js"
 import { checkRoleAdmin } from "../middlewares/checkRoleAdminMiddleware.js"
 import { checkRoleStudent } from "../middlewares/checkRoleStudentMiddleware.js"
 import { checkAllRole } from "../middlewares/checkAllRoleMiddleware.js"
 
-import { zStudentId } from "../libs/zodValidators.js";
+import { zStudentId, zEnrollmentPostBody } from "../libs/zodValidators.js";
+import type { Enrollment } from "../libs/types.js"
 
 const router = Router();
 
@@ -16,11 +17,18 @@ const router = Router();
 router.get("/", authenticateToken, checkRoleAdmin, (req: Request, res: Response) => {
     try{
     const enrollments_information = students.map(student => { 
-    const course = student.courses?.map(student => ({student}));
-    
+
+     //const course = student.courses?.map(courseId => ({courseId: courseId}));
+     // ไม่แน่ใจว่าให้ดึงข้อมูลจาก enrollments เป็นหลักมาแสดงหรือ students เป็นหลัก
+     const studentEnrollments = enrollments
+        .filter(e => e.studentId === student.studentId)
+        .map(e => ({ courseId: e.courseId }));
+
     return { 
         studentId: student.studentId,
-        courses: course,
+        courses: 
+        studentEnrollments,
+        // course,
              };
     });
 
@@ -46,7 +54,7 @@ router.get("/", authenticateToken, checkRoleAdmin, (req: Request, res: Response)
 // POST /api/v2/enrollments/reset
 router.post("/reset", authenticateToken, checkRoleAdmin, (req: Request, res: Response) => {
   try {
-    reset_users();
+    reset_enrollments();
     return res.status(200).json({
       success: true,
       message: "enrollments database has been reset",
@@ -107,10 +115,13 @@ router.get("/:studentId", authenticateToken, checkAllRole, (req: Request, res: R
 // POST /api/v2/enrollments/:studentId
 router.post("/:studentId", authenticateToken, checkRoleStudent, (req: Request, res: Response) => {
   try {
-    const body = req.body as Course;
+
+    const studentId = req.params.studentId;
+
+    const body = req.body as Enrollment;
 
     // validate req.body with predefined validator
-    const result = zCoursePostBody.safeParse(body); // check zod
+    const result = zEnrollmentPostBody.safeParse(body); // check zod
     if (!result.success) {
       return res.status(400).json({
         message: "Validation failed",
@@ -118,29 +129,41 @@ router.post("/:studentId", authenticateToken, checkRoleStudent, (req: Request, r
       });
     }
 
+
+
     //check duplicate courseId
-    const found = courses.find(
-      (course) => course.courseId === body.courseId
+    const found = enrollments.find(
+      (enrollment) => enrollment.studentId === body.studentId && enrollment.courseId === body.courseId
     );
 
     if (found) {
       return res.status(409).json({
         success: false,
-        message: "Course Id already exists",
+        message: "StudentId && CourseId is already exists",
       });
     }
 
-    // add new 
-    const new_course = body;
-    courses.push(new_course);
+   
+
+    // add new Enrollment
+    const new_enrollment = body;
+    enrollments.push(new_enrollment);
+
+    // push students data อาจจะไม่ทำเพราะคิดว่า เป็นการลงทะเบียนอยู่แต่อาจจะไม่ติดก็ได้
+    // const foundIndex = students.findIndex(
+    //   (student) => student.studentId === studentId
+    // );
+    // students[foundIndex]?.courses?.push(body.courseId);
+    
+
 
     // add response header 'Link'
-    res.set("Link", `/${new_course.courseId}`);
+    res.set("Link", `/${new_enrollment.courseId}`);
 
     return res.status(201).json({
       success: true,
-       message: `Course ${new_course.courseId} has been added successfully`,
-      data: new_course,
+       message: `Student ${new_enrollment.studentId} && Course ${new_enrollment.courseId} has been added successfully`,
+      data: new_enrollment,
     });
 
   } catch (err) {

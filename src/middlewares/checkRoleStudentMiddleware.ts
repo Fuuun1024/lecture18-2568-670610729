@@ -19,10 +19,10 @@ export const checkRoleStudent = (
 
   // 2. check if user exists (search with username) and role is STUDENT
   const user = users.find((u: User) => u.username === payload?.username);
-  if (!user || user.role !== "STUDENT") {
+  if (!user || user.role !== "STUDENT" || payload?.studentId !== req.params.studentId) {
     return res.status(401).json({
       success: false,
-      message: "Unauthorized user",
+      message: "Forbidden access",
     });
   }
 

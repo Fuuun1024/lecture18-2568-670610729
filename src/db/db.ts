@@ -21,7 +21,7 @@ export let students: Student[] = [
     courses: ["261207", "261497"],
   },
   {
-    studentId: "650615003",
+    studentId: "650610003", // ทำการแก้ไขจาก 650615003 เป็น 650610003 เนื่องจากข้อมูลไม่ตรงกับ enrollments หรือ user
     firstName: "Emily",
     lastName: "Blunt",
     program: "ISNE",

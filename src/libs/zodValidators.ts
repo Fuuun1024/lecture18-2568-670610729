@@ -55,7 +55,7 @@ export const zStudentPutBody = z.object({
 
 ////// Enrollment Validators //////
 
-export const zEnrollmentBody = z.object({
+export const zEnrollmentPostBody = z.object({
   studentId: zStudentId,
   courseId: zCourseId,
 });
