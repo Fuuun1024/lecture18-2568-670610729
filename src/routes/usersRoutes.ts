@@ -113,7 +113,8 @@ router.post("/login", (req: Request, res: Response) => {
   // 3. create JWT token (with user info object as payload) using JWT_SECRET_KEY
   //    (optional: save the token as part of User data)
 
-  const jwt_secret = process.env.JWT_SECRET || "forgot_secret"; // || ค่า defual กรณีผู้ใช้ลืม
+  // const jwt_secret = process.env.JWT_SECRET || "forgot_secret"; // || ค่า defual กรณีผู้ใช้ลืม
+  const jwt_secret = process.env.JWT_SECRET || "this_is_my_secret"; // || ค่า defual กรณีผู้ใช้ลืม
   const token = jwt.sign(
     {
     // Payload ข้อมูลที่ server อยากฝากฝังเข้าไปเก็บไว้ใน token ด้วย

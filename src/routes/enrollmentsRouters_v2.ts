@@ -218,7 +218,7 @@ router.delete("/:studentId", authenticateToken, checkRoleOwner, (req: Request, r
     res.status(200).json({
       success: true,
       message: `Student ${studentId} && Course ${body.courseId} has been deleted successfully`,
-       data: enrollments,
+      data: enrollments,
     });
     
 

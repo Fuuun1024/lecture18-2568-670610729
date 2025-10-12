@@ -15,8 +15,9 @@ export const authenticateToken = (
   res: Response,
   next: NextFunction
 ) => {
-  // 1. check Request if "authorization" header exists
-  //    and container "Bearer ...JWT-Token..."
+  // // get Authorization headers
+      
+  
   const authHeader = req.headers["authorization"];
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json({
